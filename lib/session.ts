@@ -16,13 +16,31 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
-  //   jwt: {
-  //     encode: ({ secret, token }) => {},
-  //     decode: async ({ secret, token }) => {},
-  //   },
+  jwt: {
+    encode: ({ secret, token }) => {
+      console.log(token, "__________token to encode");
+      const encodedToken = jsonwebtoken.sign(
+        {
+          ...token,
+          iss: "grafbase",
+          exp: Math.floor(Date.now() / 1000) + 60 * 60,
+        },
+        secret
+      );
+      console.log(encodedToken, "_________encodedToken");
+      return encodedToken;
+    },
+    decode: async ({ secret, token }) => {
+      console.log(token, "__________token to decode");
+      console.log(secret, "___________secret");
+      const decodedToken = jsonwebtoken.verify(token!, secret);
+      console.log(decodedToken, "_________decodedToken");
+      return decodedToken as JWT;
+    },
+  },
   theme: {
     colorScheme: "light",
-    logo: "/logo.png",
+    logo: "/logo.svg",
   },
   callbacks: {
     async session({ session }) {
